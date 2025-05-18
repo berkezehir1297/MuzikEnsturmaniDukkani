@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Destek Sistemi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://images.unsplash.com/photo-1511379938547-c1f69419868d') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(0,0,0,0.6);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 3px #000;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            resize: vertical;
+        }
+        button {
+            margin-top: 20px;
+            background-color: #4a148c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #6a1b9a;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+        }
+        ul li {
+            background-color: #4a148c;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+        }
+        ul li strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .no-requests {
+            text-align: center;
+            margin-top: 30px;
+            font-style: italic;
+            color: #ccc;
+        }
+
+        
+        .sil-btn {
+            background: #e53935;
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 10px;
+            display: inline-block;
+            transition: background 0.3s ease;
+        }
+        .sil-btn:hover {
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Destek Talebi Oluştur</h1>
+        <form id="destekForm">
+            <label for="isim">Adınız:</label>
+            <input type="text" id="isim" required placeholder="Adınızı girin" />
+
+            <label for="email">E-posta:</label>
+            <input type="email" id="email" required placeholder="E-posta adresinizi girin" />
+
+            <label for="konu">Konu:</label>
+            <input type="text" id="konu" required placeholder="Destek konusunu yazın" />
+
+            <label for="mesaj">Mesajınız:</label>
+            <textarea id="mesaj" required rows="5" placeholder="Sorununuzu veya talebinizi yazın"></textarea>
+
+            <button type="submit">Gönder</button>
+        </form>
+
+        <h2>Gönderilen Destek Talepleri</h2>
+        <ul id="talepListesi"></ul>
+        <p id="noRequestsMsg" class="no-requests" style="display:none;">Henüz destek talebi yok.</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('destekForm');
+        const talepListesi = document.getElementById('talepListesi');
+        const noRequestsMsg = document.getElementById('noRequestsMsg');
+
+        let destekTalepleri = JSON.parse(localStorage.getItem('destekTalepleri') || '[]');
+
+        function listeGuncelle() {
+            talepListesi.innerHTML = '';
+            if(destekTalepleri.length === 0) {
+                noRequestsMsg.style.display = 'block';
+                return;
+            }
+            noRequestsMsg.style.display = 'none';
+
+            destekTalepleri.forEach((talep, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>${talep.konu}</strong>
+                    <small>Gönderen: ${talep.isim} | ${talep.email}</small>
+                    <p>${talep.mesaj}</p>
+                    <button class="sil-btn" data-index="${index}">Sil</button>
+                `;
+                talepListesi.appendChild(li);
+            });
+
+            document.querySelectorAll('.sil-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    destekTalepleri.splice(index, 1);
+                    localStorage.setItem('destekTalepleri', JSON.stringify(destekTalepleri));
+                    listeGuncelle();
+                });
+            });
+        }
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const isim = document.getElementById('isim').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const konu = document.getElementById('konu').value.trim();
+            const mesaj = document.getElementById('mesaj').value.trim();
+
+            if(!isim || !email || !konu || !mesaj) {
+                alert('Lütfen tüm alanları doldurun.');
+                return;
+            }
+
+            const yeniTalep = { isim, email, konu, mesaj };
+            destekTalepleri.push(yeniTalep);
+            localStorage.setItem('destekTalepleri', JSON.stringify(destekTalepleri));
+
+            alert('Destek talebiniz başarıyla gönderildi!');
+
+            form.reset();
+            listeGuncelle();
+        });
+
+        window.onload = listeGuncelle;
+    </script>
+</body>
+</html>

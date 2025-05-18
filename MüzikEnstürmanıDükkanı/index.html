@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Müzik Dükkanı - Giriş</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://images.unsplash.com/photo-1511379938547-c1f69419868d') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #4a148c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #6a1b9a;
+        }
+
+        .toggle {
+            margin-top: 15px;
+            text-align: center;
+            color: #4a148c;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #4a148c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="form-container">
+        <div class="title">🎸 Müzik Enstrümanı Dükkanı</div>
+        <h2 id="form-title">Giriş Yap</h2>
+        <input type="text" id="username" placeholder="Kullanıcı Adı" />
+        <input type="password" id="password" placeholder="Şifre" />
+        <button onclick="girisYap()">Giriş Yap</button>
+        <div class="toggle" onclick="toggleForm()">Hesabın yok mu? Kayıt Ol</div>
+    </div>
+
+    <script>
+        let kayitModu = false;
+
+        function toggleForm() {
+            kayitModu = !kayitModu;
+            const formTitle = document.getElementById('form-title');
+            const button = document.querySelector('button');
+            const toggle = document.querySelector('.toggle');
+
+            if (kayitModu) {
+                formTitle.textContent = 'Kayıt Ol';
+                button.textContent = 'Kayıt Ol';
+                button.setAttribute('onclick', 'kayitOl()');
+                toggle.textContent = 'Zaten hesabın var mı? Giriş Yap';
+            } else {
+                formTitle.textContent = 'Giriş Yap';
+                button.textContent = 'Giriş Yap';
+                button.setAttribute('onclick', 'girisYap()');
+                toggle.textContent = 'Hesabın yok mu? Kayıt Ol';
+            }
+        }
+
+        function kayitOl() {
+            let username = document.getElementById('username').value.trim().toLowerCase();
+            let password = document.getElementById('password').value.trim();
+
+            if (!username || !password) {
+                alert("Lütfen tüm alanları doldurun.");
+                return;
+            }
+
+            if(localStorage.getItem("user_" + username)) {
+                alert("Bu kullanıcı adı zaten kayıtlı!");
+                return;
+            }
+
+            
+            const kullaniciBilgisi = {
+                username: username,
+                password: password
+            };
+
+            localStorage.setItem("user_" + username, JSON.stringify(kullaniciBilgisi));
+            alert("Kayıt başarılı! Giriş yapabilirsiniz.");
+            toggleForm();
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function girisYap() {
+            let username = document.getElementById('username').value.trim().toLowerCase();
+            let password = document.getElementById('password').value.trim();
+
+           
+            if (username === "admin" && password === "1234") {
+                alert("Admin girişi başarılı!");
+                window.location.href = "anasayfa.html";
+                return;
+            }
+
+            const kullaniciVerisiJSON = localStorage.getItem("user_" + username);
+            if (!kullaniciVerisiJSON) {
+                alert("Kullanıcı adı veya şifre hatalı!");
+                return;
+            }
+
+            const kullaniciVerisi = JSON.parse(kullaniciVerisiJSON);
+            if (kullaniciVerisi.password === password) {
+                alert("Giriş başarılı!");
+                window.location.href = "anasayfa.html";
+            } else {
+                alert("Kullanıcı adı veya şifre hatalı!");
+            }
+        }
+    </script>
+</body>
+</html>

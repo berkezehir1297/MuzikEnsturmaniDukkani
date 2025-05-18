@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Siparişlerim - Müzik Enstrümanı Dükkanı</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://images.unsplash.com/photo-1511379938547-c1f69419868d') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 5px #000;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.65);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 7px;
+            border: none;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 20px;
+            background: #6a1b9a;
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.7);
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #9c27b0;
+        }
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: #fff;
+        }
+        th {
+            background: #4a148c;
+        }
+        tr:hover {
+            background: rgba(156, 39, 176, 0.3);
+        }
+        .empty-msg {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎶 Sipariş Oluştur ve Yönet</h1>
+    <div class="container">
+        <form id="siparisForm">
+            <label for="musteriAdi">Müşteri Adı</label>
+            <input type="text" id="musteriAdi" placeholder="Müşteri Adı" required />
+
+            <label for="telefon">Telefon</label>
+            <input type="tel" id="telefon" placeholder="Telefon Numarası" pattern="[0-9]{10,15}" title="10-15 haneli telefon numarası" required />
+
+            <label for="adres">Adres</label>
+            <textarea id="adres" rows="3" placeholder="Adresinizi girin" required></textarea>
+
+            <label for="enstrumanSecim">Enstrüman Seçin</label>
+            <select id="enstrumanSecim" required>
+                <option value="" disabled selected>Enstrüman seçin</option>
+            </select>
+
+            <label for="adet">Adet</label>
+            <input type="number" id="adet" min="1" value="1" required />
+
+            <button type="submit">Siparişi Kaydet</button>
+        </form>
+
+        <div id="siparislerContainer">
+            <h2>Sipariş Listesi</h2>
+            <table id="siparisTablosu">
+                <thead>
+                    <tr>
+                        <th>Müşteri Adı</th>
+                        <th>Telefon</th>
+                        <th>Adres</th>
+                        <th>Enstrüman</th>
+                        <th>Adet</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="siparisListesi">
+                    
+                </tbody>
+            </table>
+            <p id="bosMesaj" class="empty-msg">Henüz sipariş yok.</p>
+        </div>
+    </div>
+
+    <script>
+        
+        let enstrumanlar = JSON.parse(localStorage.getItem('enstrumanlar')) || [
+            { ad: "Gitar" },
+            { ad: "Darbuka" },
+            { ad: "Saz" },
+            { ad: "Davul" },
+            { ad: "Zurna" },
+            { ad: "Klarnet" },
+            { ad: "Flüt" }
+        ];
+
+        let siparisler = JSON.parse(localStorage.getItem('siparisler')) || [];
+
+        const enstrumanSelect = document.getElementById('enstrumanSecim');
+        const siparisListesi = document.getElementById('siparisListesi');
+        const bosMesaj = document.getElementById('bosMesaj');
+
+        
+        function enstrumanlariYukle() {
+            enstrumanlar.forEach(e => {
+                const option = document.createElement('option');
+                option.value = e.ad;
+                option.textContent = e.ad;
+                enstrumanSelect.appendChild(option);
+            });
+        }
+
+        
+        function listeGuncelle() {
+            siparisListesi.innerHTML = '';
+            if (siparisler.length === 0) {
+                bosMesaj.style.display = 'block';
+                return;
+            } else {
+                bosMesaj.style.display = 'none';
+            }
+            siparisler.forEach((siparis, index) => {
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>${siparis.musteriAdi}</td>
+                    <td>${siparis.telefon}</td>
+                    <td>${siparis.adres}</td>
+                    <td>${siparis.enstruman}</td>
+                    <td>${siparis.adet}</td>
+                    <td><button onclick="siparisSil(${index})" style="background:#d32f2f; color:#fff; border:none; border-radius:5px; cursor:pointer;">Sil</button></td>
+                `;
+                siparisListesi.appendChild(tr);
+            });
+        }
+
+       
+        function siparisEkle(e) {
+            e.preventDefault();
+
+            const musteriAdi = document.getElementById('musteriAdi').value.trim();
+            const telefon = document.getElementById('telefon').value.trim();
+            const adres = document.getElementById('adres').value.trim();
+            const enstruman = enstrumanSelect.value;
+            const adet = parseInt(document.getElementById('adet').value);
+
+            if (!musteriAdi || !telefon || !adres || !enstruman || isNaN(adet) || adet < 1) {
+                alert('Lütfen tüm alanları doğru doldurun.');
+                return;
+            }
+
+            const yeniSiparis = {
+                musteriAdi,
+                telefon,
+                adres,
+                enstruman,
+                adet
+            };
+
+            siparisler.push(yeniSiparis);
+            localStorage.setItem('siparisler', JSON.stringify(siparisler));
+
+            document.getElementById('siparisForm').reset();
+            enstrumanSelect.value = '';
+
+            listeGuncelle();
+            alert('Siparişiniz başarıyla kaydedildi.');
+        }
+
+       
+        function siparisSil(index) {
+            if (confirm('Bu siparişi silmek istediğinize emin misiniz?')) {
+                siparisler.splice(index, 1);
+                localStorage.setItem('siparisler', JSON.stringify(siparisler));
+                listeGuncelle();
+            }
+        }
+
+        
+        window.onload = function() {
+            enstrumanlariYukle();
+            listeGuncelle();
+            document.getElementById('siparisForm').addEventListener('submit', siparisEkle);
+        };
+    </script>
+</body>
+</html>

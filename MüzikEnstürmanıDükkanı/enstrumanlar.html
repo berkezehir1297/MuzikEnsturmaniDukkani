@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enstrümanlar - Müzik Dükkanı</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://images.unsplash.com/photo-1511379938547-c1f69419868d') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #4a148c;
+      margin-bottom: 30px;
+      text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+    }
+    #search-container {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    #arama {
+      padding: 10px;
+      width: 300px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    #arama-btn {
+      padding: 10px 15px;
+      background: #4a148c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    #arama-btn:hover {
+      background: #6a1b9a;
+    }
+    #enstruman-listesi {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .enstruman-kutu {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 10px;
+      width: 180px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      font-size: 60px;
+      cursor: pointer;
+    }
+    .enstruman-kutu:hover {
+      transform: scale(1.05);
+    }
+    .enstruman-isim {
+      font-weight: bold;
+      color: #4a148c;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Enstrümanlar</h1>
+
+  <div id="search-container">
+    <input type="text" id="arama" placeholder="Enstrüman ara..." />
+    <button id="arama-btn" onclick="aramaYap()">Ara</button>
+  </div>
+
+  <div id="enstruman-listesi"></div>
+
+  <script>
+    const enstrumanlar = [
+      { isim: 'Gitar', emoji: '🎸', link: 'https://www.trendyol.com/sr?q=gitar' },
+      { isim: 'Darbuka', emoji: '🥁', link: 'https://www.trendyol.com/sr?q=darbuka' },
+      { isim: 'Saz', emoji: '🎶', link: 'https://www.trendyol.com/sr?q=saz' },
+      { isim: 'Davul', emoji: '🥁', link: 'https://www.trendyol.com/sr?q=davul' },
+      { isim: 'Zurna', emoji: '🎷', link: 'https://www.trendyol.com/sr?q=zurna' },
+      { isim: 'Keman', emoji: '🎻', link: 'https://www.trendyol.com/sr?q=keman' },
+      { isim: 'Piyano', emoji: '🎹', link: 'https://www.trendyol.com/sr?q=piyano' },
+      { isim: 'Flüt', emoji: '🎵', link: 'https://www.trendyol.com/sr?q=flüt' },
+      { isim: 'Saksafon', emoji: '🎷', link: 'https://www.trendyol.com/sr?q=saksafon' },
+      { isim: 'Klarinet', emoji: '🎵', link: 'https://www.trendyol.com/sr?q=klarinet' }
+    ];
+
+    const listeDiv = document.getElementById('enstruman-listesi');
+
+    function listeyiGoster(liste) {
+      listeDiv.innerHTML = '';
+      if (liste.length === 0) {
+        listeDiv.innerHTML = '<p style="color:#4a148c; font-weight:bold;">Aradığınız enstrüman bulunamadı.</p>';
+        return;
+      }
+      liste.forEach(item => {
+        const kutu = document.createElement('div');
+        kutu.className = 'enstruman-kutu';
+        kutu.innerHTML = `
+          <div>${item.emoji}</div>
+          <div class="enstruman-isim">${item.isim}</div>
+        `;
+        kutu.addEventListener('click', () => {
+          window.open(item.link, '_blank');
+        });
+        listeDiv.appendChild(kutu);
+      });
+    }
+
+    function aramaYap() {
+      const aramaDegeri = document.getElementById('arama').value.toLowerCase().trim();
+      if (!aramaDegeri) {
+        listeyiGoster(enstrumanlar);
+        return;
+      }
+      const filtrelenmis = enstrumanlar.filter(e => e.isim.toLowerCase().includes(aramaDegeri));
+      listeyiGoster(filtrelenmis);
+    }
+
+    window.onload = () => {
+      listeyiGoster(enstrumanlar);
+    };
+  </script>
+
+</body>
+</html>

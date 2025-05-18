@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Müzik Dükkanı - Anasayfa</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://images.unsplash.com/photo-1511379938547-c1f69419868d') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin-top: 40px;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px #000;
+    }
+
+    .section {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 700px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .section h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 3px #000;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 12px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button.button {
+      background-color: #4a148c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    button.button:hover {
+      background-color: #6a1b9a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      border-bottom: 1px solid #ccc;
+    }
+
+    th {
+      background-color: #4a148c;
+      color: white;
+    }
+
+    .btn-sil {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-sil:hover {
+      background: #b71c1c;
+    }
+
+    .btn-container {
+      max-width: 320px;
+      width: 100%;
+      margin: 30px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-enstruman, .btn-siparis, .btn-destek {
+      max-width: 300px;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      border: none;
+      color: white;
+    }
+
+    .btn-enstruman {
+      background: linear-gradient(45deg, #388e3c, #4caf50);
+    }
+
+    .btn-enstruman:hover {
+      background: linear-gradient(45deg, #4caf50, #388e3c);
+    }
+
+    .btn-siparis {
+      background: linear-gradient(45deg, #7b1fa2, #9c27b0);
+    }
+
+    .btn-siparis:hover {
+      background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+    }
+
+    .btn-destek {
+      background: linear-gradient(45deg, #2196F3, #21CBF3);
+    }
+
+    .btn-destek:hover {
+      background: linear-gradient(45deg, #21CBF3, #2196F3);
+    }
+
+    .cikis-button {
+      margin-top: auto;
+      margin-bottom: 20px;
+      background-color: #880e4f;
+    }
+
+    .cikis-button:hover {
+      background-color: #ad1457;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎸 Müzik Enstrümanı Dükkanı Yönetimi</h1>
+
+  
+  <section class="section">
+    <h2>Stok Miktarı Yönetimi</h2>
+    <input type="text" id="enstrumanAdi" placeholder="Enstrüman Adı">
+    <input type="text" id="kategori" placeholder="Kategori (yaylı, vurmalı vb.)">
+    <input type="number" id="stokMiktari" placeholder="Stok Miktarı">
+    <button class="button" onclick="stokEkle()">Stok Ekle</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Enstrüman</th>
+          <th>Kategori</th>
+          <th>Stok</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody id="stokListesi"></tbody>
+    </table>
+  </section>
+
+  
+  <div class="btn-container">
+    <button class="btn-enstruman" onclick="window.location.href='enstrumanlar.html'">Enstrümanlar</button>
+    <button class="btn-siparis" onclick="window.location.href='siparisler.html'">Siparişlerim</button>
+    <button class="btn-destek" onclick="window.location.href='destek.html'">Destek Sayfası</button>
+  </div>
+
+  
+  <button class="button cikis-button" onclick="cikisYap()">Çıkış Yap</button>
+
+  <script>
+    function stokListele() {
+      const stoklar = JSON.parse(localStorage.getItem('stoklar') || '[]');
+      const tbody = document.getElementById('stokListesi');
+      tbody.innerHTML = '';
+
+      stoklar.forEach((urun, index) => {
+        const satir = document.createElement('tr');
+        satir.innerHTML = `
+          <td>${urun.ad}</td>
+          <td>${urun.kategori}</td>
+          <td>${urun.stok}</td>
+          <td><button class="btn-sil" onclick="stokSil(${index})">Sil</button></td>
+        `;
+        tbody.appendChild(satir);
+      });
+    }
+
+    function stokEkle() {
+      const ad = document.getElementById('enstrumanAdi').value.trim();
+      const kategori = document.getElementById('kategori').value.trim();
+      const stok = parseInt(document.getElementById('stokMiktari').value);
+
+      if (!ad || !kategori || isNaN(stok) || stok < 0) {
+        alert('Lütfen geçerli bilgiler girin.');
+        return;
+      }
+
+      const stoklar = JSON.parse(localStorage.getItem('stoklar') || '[]');
+      stoklar.push({ ad, kategori, stok });
+      localStorage.setItem('stoklar', JSON.stringify(stoklar));
+
+      document.getElementById('enstrumanAdi').value = '';
+      document.getElementById('kategori').value = '';
+      document.getElementById('stokMiktari').value = '';
+
+      stokListele();
+    }
+
+    function stokSil(index) {
+      const stoklar = JSON.parse(localStorage.getItem('stoklar') || '[]');
+      stoklar.splice(index, 1);
+      localStorage.setItem('stoklar', JSON.stringify(stoklar));
+      stokListele();
+    }
+
+    function cikisYap() {
+      if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+        localStorage.clear();
+        window.location.href = 'index.html';
+      }
+    }
+
+    window.onload = function () {
+      stokListele();
+    };
+  </script>
+</body>
+</html>
